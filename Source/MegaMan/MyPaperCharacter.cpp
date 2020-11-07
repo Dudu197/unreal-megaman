@@ -12,18 +12,76 @@ void AMyPaperCharacter::Tick(float DeltaSeconds)
 
 void AMyPaperCharacter::SetCurrentFlipbook()
 {
+	UCharacterMovementComponent* movementComp = GetCharacterMovement();
+
+	if (movementComp->IsFalling())
+	{
+		if (IsDashing)
+		{
+			GetSprite()->SetFlipbook(DashingFlipbook);
+		}
+		else
+		{
+			GetSprite()->SetFlipbook(FallingFlipbook);
+		}
+		return;
+	}
+
+	IsDashing = false;
+
 	if (GetVelocity().Size() > 0)
 	{
-		GetSprite()->SetFlipbook(RunningFlipbook);
+		if (IsShooting)
+		{
+			GetSprite()->SetFlipbook(RunningShootingFlipbook);
+		}
+		else {
+			GetSprite()->SetFlipbook(RunningFlipbook);
+		}
 	}
 	else {
-		GetSprite()->SetFlipbook(IdleFlipbook);
+		if (IsShooting)
+		{
+			GetSprite()->SetFlipbook(ShootingFlipbook);
+		}
+		else
+		{
+			GetSprite()->SetFlipbook(IdleFlipbook);
+		}
 	}
 }
 
 void AMyPaperCharacter::MakeItJump()
 {
 	Jump();
+}
+
+void AMyPaperCharacter::PressShoot()
+{
+	IsShooting = true;
+}
+
+void AMyPaperCharacter::ReleaseShoot()
+{
+	IsShooting = false;
+}
+
+void AMyPaperCharacter::Dash()
+{
+	if (!IsDashing)
+	{
+		IsDashing = true;
+
+		UCharacterMovementComponent* movementComp = GetCharacterMovement();
+		if (GetController()->GetControlRotation().Yaw == 0)
+		{
+			LaunchCharacter(FVector(DashSpeed, 0, DashHeight), true, false);
+		}
+		else
+		{
+			LaunchCharacter(FVector(-DashSpeed, 0, DashHeight), true, false);
+		}
+	}
 }
 
 void AMyPaperCharacter::MoveRight(float AxisValue)
@@ -46,5 +104,8 @@ void AMyPaperCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AMyPaperCharacter::MakeItJump);
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &AMyPaperCharacter::PressShoot);
+	PlayerInputComponent->BindAction("Shoot", IE_Released, this, &AMyPaperCharacter::ReleaseShoot);
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AMyPaperCharacter::Dash);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AMyPaperCharacter::MoveRight);
 }

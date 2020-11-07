@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PaperCharacter.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include <Paper2D\Classes\PaperFlipbook.h>
 #include <Paper2D\Classes\PaperFlipbookComponent.h>
 #include "MyPaperCharacter.generated.h"
@@ -24,14 +25,34 @@ class MEGAMAN_API AMyPaperCharacter : public APaperCharacter
 	// Input functions
 	void MoveRight(float AxisValue);
 	void MakeItJump();
+	void PressShoot();
+	void ReleaseShoot();
+	void Dash();
 
 	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent);
 
 	// Sprites
 	UPROPERTY(EditAnywhere, Category="Flipbooks")
 	UPaperFlipbook* IdleFlipbook;
-
 	UPROPERTY(EditAnywhere, Category = "Flipbooks")
-	UPaperFlipbook *RunningFlipbook;
+	UPaperFlipbook* RunningFlipbook;
+	UPROPERTY(EditAnywhere, Category = "Flipbooks")
+	UPaperFlipbook* ShootingFlipbook;
+	UPROPERTY(EditAnywhere, Category = "Flipbooks")
+	UPaperFlipbook* RunningShootingFlipbook;
+	UPROPERTY(EditAnywhere, Category = "Flipbooks")
+	UPaperFlipbook* FallingFlipbook;
+	UPROPERTY(EditAnywhere, Category = "Flipbooks")
+	UPaperFlipbook* DashingFlipbook;
+
+	// Configs
+	UPROPERTY(EditAnywhere, Category = "Dash")
+	float DashSpeed;
+	UPROPERTY(EditAnywhere, Category = "Dash")
+	float DashHeight;
+
+	private:
+		bool IsShooting = false;
+		bool IsDashing = false;
 	
 };
